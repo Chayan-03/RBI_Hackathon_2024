@@ -11,7 +11,7 @@ class SMSPredictView(APIView):
         if serializer.is_valid():
             sms_text = serializer.validated_data['text']
             prediction = predict_sms(sms_text)
-            if prediction == 1:
+            if prediction == 1 or prediction == "1":
                 result = "This SMS is likely spam." 
             else:
                 result="This SMS is likely not spam."
