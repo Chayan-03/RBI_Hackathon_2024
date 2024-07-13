@@ -35,3 +35,29 @@ class TransactionPatternDetectionModel(models.Model):
 
     def __str__(self):
         return f"{self.sender_device_id} to {self.receiver_upi_ac_no} - {self.amount}"
+
+
+class TransactionModel(models.Model):
+    TransactionID = models.CharField(max_length=255)
+    CustomerID = models.CharField(max_length=255)
+    CustomerDOB= models.DateField()
+    CustGender = models.CharField(max_length=7)
+    CustLocation = models.CharField(max_length=255)
+    CustAccountBalance= models.FloatField()
+    TransactionDate= models.DateField()
+    TransactionTime = models.BigIntegerField()
+    TransactionAmount = models.FloatField()
+
+    def __str__(self):
+        return f"Transaction {self.TransactionID} by Customer {self.CustomerID} on {self.TransactionDate}"
+    
+class CustomerAccount(models.Model):
+    CustomerId = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    CreditScore = models.IntegerField()
+    CustLocation = models.CharField(max_length=255)
+    CustGender = models.CharField(max_length=7)
+    CustAge = models.IntegerField()
+    CustAccountBalance= models.FloatField()
+    
+    
