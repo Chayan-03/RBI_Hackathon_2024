@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t0&bsur2_#32fqehv+0$u-o*z=l*n%bad4hknsr2vk!oxraq#j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["harbringer.vercel.app"]
+ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'accounts',
     'rest_framework_simplejwt',
     'corsheaders',
 ]
@@ -85,7 +86,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'api.wsgi.app'
 
 
 # Database
@@ -97,6 +98,19 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'your_database_name',
+#         'USER': 'root',
+#         'PASSWORD': '728148',
+#         'HOST': 'localhost',  # Or your MySQL host IP
+#         'PORT': '3306',       # MySQL default port
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#         },
+#     }
+# }
 
 
 # Password validation
