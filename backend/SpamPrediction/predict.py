@@ -16,4 +16,6 @@ vectorizer = joblib.load(vectorizer_path)
 def predict_sms(sms_text):
     new_sms_features = vectorizer.transform([sms_text])
     prediction = model.predict(new_sms_features)[0]
+    print(prediction)
     return prediction
+# print(predict_sms("Congratulations! Your credit score entitles you to a no-interest Visa credit card. Click here to claim: [Link]"))
