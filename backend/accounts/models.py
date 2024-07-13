@@ -1,5 +1,5 @@
 from django.db import models
-
+import datetime
 # Create your models here.
 class LockingSystemModel(models.Model):
     credit = models.BooleanField(default=False)
@@ -50,6 +50,11 @@ class TransactionModel(models.Model):
 
     def __str__(self):
         return f"Transaction {self.TransactionID} by Customer {self.CustomerID} on {self.TransactionDate}"
+    def get_transaction_datetime(self):
+        """
+        Convert Unix timestamp to datetime.
+        """
+        return datetime.datetime.fromtimestamp(self.TransactionTime)
     
 class CustomerAccount(models.Model):
     CustomerId = models.CharField(max_length=255)
@@ -59,5 +64,5 @@ class CustomerAccount(models.Model):
     CustGender = models.CharField(max_length=7)
     CustAge = models.IntegerField()
     CustAccountBalance= models.FloatField()
-    
+
     

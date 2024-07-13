@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'accounts',
+    'SpamPrediction',
     'rest_framework_simplejwt',
     'corsheaders',
 ]
