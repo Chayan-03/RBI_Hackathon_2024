@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-t0&bsur2_#32fqehv+0$u-o*z=l*n%bad4hknsr2vk!oxraq#j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['127.0.0.1', 'rbihackathon2024-production.up.railway.app']
 
 
 # Application definition
