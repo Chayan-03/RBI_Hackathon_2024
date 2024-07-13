@@ -15,5 +15,5 @@ class SMSPredictView(APIView):
                 result = "This SMS is likely spam." 
             else:
                 result="This SMS is likely not spam."
-            return Response({"prediction": prediction}, status=status.HTTP_200_OK)
+            return Response({"prediction": result}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
