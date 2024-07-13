@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-t0&bsur2_#32fqehv+0$u-o*z=l*n%bad4hknsr2vk!oxraq#j')
 
 DEBUG = True
-
+APPEND_SLASH = False
 ALLOWED_HOSTS = ['127.0.0.1', 'rbihackathon2024-production.up.railway.app']
 
 INSTALLED_APPS = [
