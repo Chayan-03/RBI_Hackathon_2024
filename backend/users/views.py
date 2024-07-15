@@ -1,5 +1,6 @@
 from .permissions import PostOnlyPermission
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserDetailSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .models import User
 from .renderers import UserRenderer
 from django.shortcuts import render
@@ -10,6 +11,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 
 # manually generate token 
@@ -53,3 +55,13 @@ class UserLoginView(APIView):
                 return Response({'errors': {'non_field_errors': ['Email or Password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+class AllUserDetail(ListAPIView):
+    permission_classes =[IsAdminUser]
+    queryset = User.objects.all()
+    serializer_class = UserDetailSerializer
+
+class UserProfileDetail(RetrieveAPIView):
+    serializer_class = UserDetailSerializer
+    permission_classes=[IsAuthenticated] 
+    def get_object(self):
+        return self.request.user

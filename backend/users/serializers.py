@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User, UserManager
+from accounts.serializers import CreditCardSerializer, DebitCardSerializer
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(
@@ -9,7 +10,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'name', 'password', 'password2', 'upi_id']
+        fields = ['email', 'name', 'password', 'password2', 'phn','upi_id']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -31,7 +32,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ['email','password']
     
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserDetailSerializer(serializers.ModelSerializer):
+    credit_cards = CreditCardSerializer(many=True, read_only=True, source='creditcardmodel_set')
+    debcredit_cards = DebitCardSerializer(many=True, read_only=True, source='creditcardmodel_set')
     class Meta:
         model = User
-        field =["id", "email","name"]
+        fields = ['id', 'email', 'name', 'upi_id', 'phn', 'is_active', 'is_admin', 'created_at', 'updated_at', 'credit_cards', 'debit_cards']
