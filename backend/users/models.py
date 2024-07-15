@@ -4,7 +4,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 # Create your models here.
 # custom user manager 
 class UserManager(BaseUserManager):
-    def create_user(self, email,name,upi_id, password=None, password2 = None):
+    def create_user(self, email,name,phn, upi_id,password=None, password2 = None):
         """
         Creates and saves a User with the given email, name , upi_id and password.
         """
@@ -14,14 +14,15 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             name=name,
-            upi_id = upi_id
+            upi_id = upi_id,
+            phn = phn
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self,email,name,upi_id, password=None):
+    def create_superuser(self,email,name,phn,upi_id, password=None):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
@@ -30,7 +31,8 @@ class UserManager(BaseUserManager):
             email,
             password=password,
             name= name,
-            upi_id =upi_id
+            phn= phn,
+            upi_id= upi_id
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -45,15 +47,16 @@ class User(AbstractBaseUser):
     )
     name = models.CharField(max_length=255)
     upi_id = models.CharField(max_length=255,unique=True)    
+    phn = models.IntegerField(default=1234)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    # to do may add bank details like ac no etc
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name","upi_id"]
+    REQUIRED_FIELDS = ["name","phn", "upi_id"]
 
     def __str__(self):
         return self.email
