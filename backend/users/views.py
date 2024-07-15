@@ -23,7 +23,7 @@ def get_tokens_for_user(user):
 
 
 class UserRegistrationView(APIView):
-    renderer_classes= [UserRenderer]
+    # renderer_classes= [UserRenderer]
     def post(self, request, format =None):
         serializer = UserRegistrationSerializer(data= request.data)
         if serializer.is_valid(raise_exception=True):
@@ -34,25 +34,22 @@ class UserRegistrationView(APIView):
     
 
 class UserLoginView(APIView):
-    renderer_classes= [UserRenderer]
-    def post(self, request, format =None):
-        serializer= UserLoginSerializer(data = request.data)
+    # renderer_classes= [UserRenderer]
+    def post(self, request, format=None):
+        serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             email = serializer.data.get('email')
             password = serializer.data.get('password')
-            user =authenticate(email=email, password= password)
+            user = authenticate(email=email, password=password)
             if user is not None:
-                token= get_tokens_for_user(user)
-                return Response({'token': token,'msg': 'login success'},status = status.HTTP_200_OK)
+                tokens = get_tokens_for_user(user)
+                response_data = {
+                    'refresh': tokens['refresh'],
+                    'access': tokens['access'],
+                    'msg': 'login success'
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
             else:
-                return Response({'errors': {'non_field_errors':['Email or Password is not valid']}},status = status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
-    
-
-class UserProfileView(APIView):
-    renderer_classes=[UserRenderer]
-    def get(self, request, format= None):
-        serializer= UserProfileSerializer(request.user)
-        if serializer.is_valid():
-            return Response(serializer.data,status= status.HTTP_200_OK)
+                return Response({'errors': {'non_field_errors': ['Email or Password is not valid']}}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
