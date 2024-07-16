@@ -56,12 +56,16 @@ class UserLoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class AllUserDetail(ListAPIView):
-    permission_classes =[IsAdminUser]
-    queryset = User.objects.all()
-    serializer_class = UserDetailSerializer
+    permission_classes =[IsAuthenticated,]
+    def get(self, request):
+        queryset = User.objects.all()
+        serializer_class = UserDetailSerializer(many = True)
+        return Response(serializer_class, status=status.HTTP_202_OK)
 
 class UserProfileDetail(RetrieveAPIView):
-    serializer_class = UserDetailSerializer
-    permission_classes=[IsAuthenticated] 
-    def get_object(self):
-        return self.request.user
+    permission_classes = (IsAuthenticated,)
+    # For fetching details of the logged in user
+    def get(self, request):
+        user = request.user
+        serializer_data = UserDetailSerializer(user).data
+        return Response(serializer_data, status=status.HTTP_200_OK)
