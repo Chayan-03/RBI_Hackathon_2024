@@ -34,7 +34,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     credit_cards = CreditCardSerializer(many=True, read_only=True, source='creditcardmodel_set')
-    debcredit_cards = DebitCardSerializer(many=True, read_only=True, source='creditcardmodel_set')
+    debit_cards = DebitCardSerializer(many=True, read_only=True, source='creditcardmodel_set')
     class Meta:
         model = User
         fields = ['id', 'email', 'name', 'upi_id', 'phn', 'is_active', 'is_admin', 'created_at', 'updated_at', 'credit_cards', 'debit_cards']

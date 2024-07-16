@@ -68,7 +68,7 @@ class GenerateRandomDebitCardView(APIView):
                 user=user,
                 card_number=generate_random_card_number(),
                 cvv= generate_random_cvv(),
-                card_holder_name=f'{user.first_name} {user.last_name}',
+                card_holder_name=f'{user.name}',
                 expiration_date=timezone.now().date() + timezone.timedelta(days=365*5),  # 5 years validity
                 pin=generate_random_pin()  # Generate PIN
             )
