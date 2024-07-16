@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TransactionModel, LockingSystemModel, CreditCardModel , DebitCardModel, NetBankingDetailsModel, VirtualCreditCardModel , VirtualDebitCardModel , VirtualNetBankingDetailsModel
+from .models import Report, TransactionModel, LockingSystemModel, CreditCardModel , DebitCardModel, VirtualCreditCardModel , VirtualDebitCardModel 
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,12 +21,6 @@ class DebitCardSerializer(serializers.ModelSerializer):
         model = DebitCardModel
         fields = '__all__'
 
-
-class NetBankingDetailsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VirtualNetBankingDetailsModel
-        fields = '__all__'
-
 class VirtualCreditCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = VirtualCreditCardModel
@@ -37,9 +31,9 @@ class VirtualDebitCardSerializer(serializers.ModelSerializer):
         model = VirtualDebitCardModel
         fields = '__all__'
 
-
-class VirtualNetBankingDetailsSerializer(serializers.ModelSerializer):
+class ReportSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VirtualNetBankingDetailsModel
+        model = Report
         fields = '__all__'
+
 
