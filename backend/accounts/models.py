@@ -91,6 +91,7 @@ class TransactionModel(models.Model):
     transaction_date = models.DateField(auto_now_add=True)  # Change to auto_now_add=True
     transaction_time = models.BigIntegerField()
     transaction_amount = models.FloatField()
+    device_name = models.CharField(max_length=255, default="abc")
 
     def __str__(self):
         return self.transaction_id

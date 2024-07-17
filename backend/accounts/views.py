@@ -15,6 +15,7 @@ from django.utils import timezone
 import logging
 import traceback
 import uuid
+from django.utils import timezone
 
 
 
@@ -120,3 +121,54 @@ class ReportTransaction(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PerformTransactionView(APIView):
+    def post(self, request):
+        data = request.data
+        sender_upi = data.get('sender_upi')
+        receiver_upi = data.get('receiver_upi_id')
+        transaction_amount = data.get('amount')
+        device_name = data.get('device_name')
+        location = data.get('location')
+
+        # Retrieve sender and receiver accounts
+        try:
+            sender = User.objects.get(upi_id=sender_upi)
+            receiver = User.objects.get(upi_id=receiver_upi)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid UPI ID(s)'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Retrieve sender and receiver customer accounts
+        try:
+            sender_account = CustomerAccount.objects.get(user=sender)
+            receiver_account = CustomerAccount.objects.get(user=receiver)
+        except CustomerAccount.DoesNotExist:
+            return Response({'error': 'Customer account not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if sender has sufficient balance
+        if sender_account.customer_account_balance < transaction_amount:
+            return Response({'error': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Perform transaction
+        sender_account.customer_account_balance -= transaction_amount
+        receiver_account.customer_account_balance += transaction_amount
+
+        sender_account.save()
+        receiver_account.save()
+
+        # Save transaction details
+        transaction = TransactionModel.objects.create(
+            transaction_id=str(uuid.uuid4()),
+            sender_phnno=sender.phn,
+            receiver_phno=receiver.phn,
+            sender_upi=sender_upi,
+            receiver_upi=receiver_upi,
+            customer_id=sender_account.customer_id,
+            customer_location=location,
+            customer_account_balance=sender_account.customer_account_balance,
+            transaction_date=timezone.now().date(),
+            transaction_time=int(timezone.now().timestamp()),
+            transaction_amount=transaction_amount,
+            device_name=device_name
+        )
+
+        return Response({'message': 'Transaction successful'}, status=status.HTTP_200_OK)
