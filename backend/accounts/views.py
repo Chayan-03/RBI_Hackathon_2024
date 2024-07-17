@@ -16,7 +16,7 @@ import logging
 import traceback
 import uuid
 from django.utils import timezone
-
+from django.db.models import Q
 
 
 class UserTransactionsView(ListAPIView):
@@ -25,7 +25,10 @@ class UserTransactionsView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return TransactionModel.objects.filter(sender_phnno=user.phn)
+        return TransactionModel.objects.filter(
+            Q(sender_upi=user.upi_id) | Q(receiver_upi=user.upi_id)
+        )
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
