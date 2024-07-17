@@ -1,16 +1,18 @@
 from rest_framework import serializers
-from .models import Report, TransactionModel, LockingSystemModel, CreditCardModel , DebitCardModel, VirtualCreditCardModel , VirtualDebitCardModel 
+from .models import Report, TransactionModel, CreditCardModel , DebitCardModel, VirtualCreditCardModel , VirtualDebitCardModel 
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionModel
         fields = '__all__'
 
-class LockingSystemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LockingSystemModel
-        fields = '__all__'
+class LockStatusSerializer(serializers.Serializer):
+    credit = serializers.BooleanField()
+    debit = serializers.BooleanField()
+    net_banking = serializers.BooleanField()
+    upi = serializers.BooleanField()
 
+    
 class CreditCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditCardModel

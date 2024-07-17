@@ -6,17 +6,6 @@ from django.conf import settings
 
 
 # Create your models here.
-class LockingSystemModel(models.Model):
-    credit = models.BooleanField(default=False)
-    debit = models.BooleanField(default=False)
-    net_banking = models.BooleanField(default=False)
-    upi = models.BooleanField(default=False)
-    # banking_app = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Locking System - Credit: {self.credit}, Debit: {self.debit}, Net Banking: {self.net_banking}, UPI: {self.upi}"
-
-
 class CreditCardModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=16)
@@ -24,10 +13,10 @@ class CreditCardModel(models.Model):
     cvv = models.IntegerField()
     pin = models.CharField(max_length=4, null=True, blank=True)  # Add PIN field
     expiration_date = models.DateField()
+    is_locked = models.BooleanField(default=False)  # Add is_locked field
 
     def __str__(self):
         return f"Credit Card {self.card_number} for {self.card_holder_name}"
-
 
 class DebitCardModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -36,19 +25,21 @@ class DebitCardModel(models.Model):
     cvv = models.IntegerField()
     expiration_date = models.DateField()
     pin = models.CharField(max_length=4, null=True, blank=True)  # Add PIN field
+    is_locked = models.BooleanField(default=False)  # Add is_locked field
 
     def __str__(self):
         return f"Debit Card {self.card_number} for {self.card_holder_name}"
-
 
 class NetBankingDetailsModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bank_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=50)
     ifsc_code = models.CharField(max_length=20)
+    is_locked = models.BooleanField(default=False)  # Add is_locked field
 
     def __str__(self):
         return f"Net Banking Details for {self.bank_name}"
+    
 
 
 class VirtualCreditCardModel(models.Model):

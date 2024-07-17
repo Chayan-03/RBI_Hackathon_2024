@@ -52,6 +52,7 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_upi_locked = models.BooleanField(default=False)
     # to do may add bank details like ac no etc
     objects = UserManager()
 

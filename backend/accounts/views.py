@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
-from .models import Report, TransactionModel, VirtualDebitCardModel , VirtualCreditCardModel, CustomerAccount
-from .serializers import ReportSerializer, TransactionSerializer, CreditCardSerializer, DebitCardSerializer, VirtualCreditCardSerializer, VirtualDebitCardSerializer
+from .models import Report, TransactionModel, VirtualDebitCardModel , VirtualCreditCardModel, CustomerAccount, CreditCardModel, DebitCardModel, NetBankingDetailsModel
+from .serializers import ReportSerializer, TransactionSerializer, CreditCardSerializer, DebitCardSerializer, VirtualCreditCardSerializer, VirtualDebitCardSerializer,  LockStatusSerializer
 import random
 from datetime import date, time
 from rest_framework.views import APIView
@@ -121,8 +121,10 @@ class ReportTransaction(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# In accounts/views.py (update the PerformTransactionView)
+
 class PerformTransactionView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
         sender_upi = data.get('sender_upi')
@@ -144,6 +146,10 @@ class PerformTransactionView(APIView):
             receiver_account = CustomerAccount.objects.get(user=receiver)
         except CustomerAccount.DoesNotExist:
             return Response({'error': 'Customer account not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the sender's payment method is locked
+        if sender_account.is_frozen or sender.is_upi_locked:
+            return Response({'error': 'Sender account is locked'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if sender has sufficient balance
         if sender_account.customer_account_balance < transaction_amount:
@@ -173,3 +179,43 @@ class PerformTransactionView(APIView):
         )
 
         return Response({'message': 'Transaction successful'}, status=status.HTTP_200_OK)
+
+
+class LockStatusUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        data = request.data
+        serializer = LockStatusSerializer(data=data)
+        
+        if serializer.is_valid():
+            # Update credit card lock status
+            CreditCardModel.objects.filter(user=user).update(is_locked=serializer.validated_data['credit'])
+            
+            # Update debit card lock status
+            DebitCardModel.objects.filter(user=user).update(is_locked=serializer.validated_data['debit'])
+            
+            # Update net banking lock status
+            NetBankingDetailsModel.objects.filter(user=user).update(is_locked=serializer.validated_data['net_banking'])
+            
+            # Update UPI lock status
+            user.is_upi_locked = serializer.validated_data['upi']
+            user.save()
+
+            # Get the updated lock status for each account type
+            credit_locked = CreditCardModel.objects.filter(user=user, is_locked=True).exists()
+            debit_locked = DebitCardModel.objects.filter(user=user, is_locked=True).exists()
+            net_banking_locked = NetBankingDetailsModel.objects.filter(user=user, is_locked=True).exists()
+            upi_locked = user.is_upi_locked
+
+            response_data = {
+                "credit": credit_locked,
+                "debit": debit_locked,
+                "net_banking": net_banking_locked,
+                "upi": upi_locked
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
