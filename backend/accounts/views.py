@@ -122,6 +122,7 @@ class ReportTransaction(APIView):
 
 
 class PerformTransactionView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
         sender_upi = data.get('sender_upi')
