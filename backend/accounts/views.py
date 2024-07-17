@@ -14,6 +14,7 @@ from users.models import User
 from django.utils import timezone
 import logging
 import traceback
+import uuid
 
 
 
@@ -117,3 +118,5 @@ class ReportTransaction(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
