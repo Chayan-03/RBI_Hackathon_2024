@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+xgboost
+
+
+# pip install -r requirements.txt
