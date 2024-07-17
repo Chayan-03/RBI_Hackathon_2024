@@ -8,7 +8,7 @@ from datetime import date, time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import generate_random_card_number, generate_random_account_number, generate_random_ifsc_code, generate_random_bank_name, generate_random_pin, generate_random_cvv
+from .utils import generate_random_card_number,  generate_random_pin, generate_random_cvv, handle_report
 from apscheduler.schedulers.background import BackgroundScheduler
 from users.models import User
 from django.utils import timezone
@@ -219,3 +219,20 @@ class LockStatusUpdateView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class ReportTransactionView(APIView):
+    def post(self, request, *args, **kwargs):
+        transaction_id = request.data.get('transaction_id')
+        description = request.data.get('description')
+        image_1 = request.FILES.get('product_image_1', None)
+        image_2 = request.FILES.get('product_image_2', None)
+
+        try:
+            transaction = TransactionModel.objects.get(transaction_id=transaction_id)
+            receiver_upi = transaction.receiver_upi
+            handle_report(receiver_upi, transaction, description, image_1, image_2)
+            return Response({'message': 'Report submitted successfully.'}, status=status.HTTP_200_OK)
+        except TransactionModel.DoesNotExist:
+            return Response({'error': 'Transaction not found.'}, status=status.HTTP_404_NOT_FOUND)

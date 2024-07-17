@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserTransactionsView,GenerateRandomCreditCardView, GenerateRandomDebitCardView, ReportTransaction, PerformTransactionView, LockStatusUpdateView
+from .views import UserTransactionsView,GenerateRandomCreditCardView, GenerateRandomDebitCardView, ReportTransaction, PerformTransactionView, LockStatusUpdateView, ReportTransactionView
 
 
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('report/', ReportTransaction.as_view(), name='report-transaction'),
     path('perform-transaction/', PerformTransactionView.as_view(), name='perform-transaction'),
     path('update-lock-status/', LockStatusUpdateView.as_view(), name='update-lock-status'),
+    path('report-transaction/', ReportTransactionView.as_view(), name='report-transaction'),
 ]
