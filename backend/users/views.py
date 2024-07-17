@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework import status
 
 
 # manually generate token 
@@ -57,10 +58,9 @@ class UserLoginView(APIView):
         
 class AllUserDetail(ListAPIView):
     permission_classes =[IsAuthenticated,]
-    def get(self, request):
-        queryset = User.objects.all()
-        serializer_class = UserDetailSerializer(many = True)
-        return Response(serializer_class, status=status.HTTP_202_OK)
+    ueryset = User.objects.all()
+    serializer_class = UserDetailSerializer(many = True)
+    
 
 class UserProfileDetail(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)

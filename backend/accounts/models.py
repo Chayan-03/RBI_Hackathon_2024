@@ -2,6 +2,8 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from users.models import User
+from django.conf import settings
+
 
 # Create your models here.
 class LockingSystemModel(models.Model):
@@ -76,22 +78,26 @@ class VirtualDebitCardModel(models.Model):
 
 
 class TransactionModel(models.Model):
-    transaction_id = models.CharField(max_length=255)
+    transaction_id = models.CharField(max_length=255, unique=True)
     sender_phnno = models.IntegerField(default=1234)
     receiver_phno = models.IntegerField(default=1234)
+    sender_upi = models.CharField(max_length=255)
+    receiver_upi = models.CharField(max_length=255)
     customer_id = models.CharField(max_length=255)
-    customer_dob = models.DateField()
-    customer_gender = models.CharField(max_length=7)
-    customer_location = models.CharField(max_length=255)
+    customer_dob = models.DateField(null=True)
+    customer_gender = models.CharField(max_length=7, null=True)
+    customer_location = models.CharField(max_length=255, null=True)
     customer_account_balance = models.FloatField()
-    transaction_date = models.DateField()
+    transaction_date = models.DateField(auto_now_add=True)  # Change to auto_now_add=True
     transaction_time = models.BigIntegerField()
     transaction_amount = models.FloatField()
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, default="1")
 
     def __str__(self):
-        return f"Transaction {self.transaction_id} by Customer {self.customer_id} on {self.transaction_date}"
+        return self.transaction_id
 
+    # receiver = models.ForeignKey(User, on_delete=models.CASCADE, default="1")
+
+   
     def get_transaction_datetime(self):
         """
         Convert Unix timestamp to datetime.
@@ -100,6 +106,7 @@ class TransactionModel(models.Model):
 
 
 class CustomerAccount(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)  # Assuming '1' is a valid user ID
     customer_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, default="defaultemail@email.com")
@@ -113,6 +120,10 @@ class CustomerAccount(models.Model):
 
     def __str__(self):
         return f"Customer Account {self.customer_id} - {self.name}"
+    def __str__(self):
+        return f"Customer Account {self.customer_id} - {self.name}"
+
+
 
 
 class Report(models.Model):
