@@ -17,6 +17,7 @@ import traceback
 import uuid
 from django.utils import timezone
 from django.db.models import Q
+from rest_framework.viewsets import ModelViewSet
 
 
 class UserTransactionsView(ListAPIView):
@@ -127,7 +128,6 @@ class ReportTransaction(APIView):
 # In accounts/views.py (update the PerformTransactionView)
 
 class PerformTransactionView(APIView):
-    # permission_classes = [IsAuthenticated]
     def post(self, request):
         data = request.data
         sender_upi = data.get('sender_upi')
@@ -150,9 +150,9 @@ class PerformTransactionView(APIView):
         except CustomerAccount.DoesNotExist:
             return Response({'error': 'Customer account not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the sender's payment method is locked
-        if sender_account.is_frozen or sender.is_upi_locked:
-            return Response({'error': 'Sender account is locked'}, status=status.HTTP_400_BAD_REQUEST)
+        # Check if the sender's or receiver's account is frozen
+        if sender_account.is_frozen or receiver_account.is_frozen or sender.is_upi_locked:
+            return Response({'error': 'Transaction cannot be performed. One of the accounts is frozen.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if sender has sufficient balance
         if sender_account.customer_account_balance < transaction_amount:
@@ -182,7 +182,6 @@ class PerformTransactionView(APIView):
         )
 
         return Response({'message': 'Transaction successful'}, status=status.HTTP_200_OK)
-
 
 class LockStatusUpdateView(APIView):
     permission_classes = [IsAuthenticated]

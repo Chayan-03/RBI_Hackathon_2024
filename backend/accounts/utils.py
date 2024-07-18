@@ -23,7 +23,6 @@ def generate_random_pin(length=4):
 def generate_random_cvv():
     return random.randint(100, 999) 
 
-
 def handle_report(receiver_upi, transaction, description, image_1, image_2):
     report, created = Report.objects.get_or_create(receiver_upi=receiver_upi, transaction=transaction)
     report.report_count = F('report_count') + 1
@@ -34,8 +33,11 @@ def handle_report(receiver_upi, transaction, description, image_1, image_2):
         report.image_2 = image_2
     report.save()
 
-    if report.report_count > 10:
-        customer_account = CustomerAccount.objects.filter(upi_id=receiver_upi).first()
+    # Refresh the report instance to get the updated report_count value
+    report.refresh_from_db()
+
+    if report.report_count >= 10:
+        customer_account = CustomerAccount.objects.filter(user__upi_id=receiver_upi).first()
         if customer_account:
             customer_account.is_frozen = True
             customer_account.save()
