@@ -54,7 +54,6 @@ class VirtualCreditCardModel(models.Model):
     def __str__(self):
         return f"Virtual Credit Card {self.card_number} for {self.card_holder_name}"
 
-
 class VirtualDebitCardModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=16)
@@ -63,9 +62,6 @@ class VirtualDebitCardModel(models.Model):
     expiration_date = models.DateField()
     pin = models.CharField(max_length=4, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)  # Add timestamp
-
-    def __str__(self):
-        return f"Virtual Debit Card {self.card_number} for {self.card_holder_name}"
 
 class CustomerAccount(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1)  # Assuming '1' is a valid user ID

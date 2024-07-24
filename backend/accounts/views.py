@@ -33,13 +33,14 @@ class UserTransactionsView(ListAPIView):
 # Configure logging
 logger = logging.getLogger(__name__)
 
-def delete_expired_data():
-    expiration_time = timezone.now() - timezone.timedelta(minutes=5)
-    VirtualCreditCardModel.objects.filter(created_at__lt=expiration_time).delete()
-    VirtualDebitCardModel.objects.filter(created_at__lt=expiration_time).delete()
+def remove_expired_virtual_cards():
+    expiry_time = timezone.now() - timezone.timedelta(minutes=5)
+    VirtualCreditCardModel.objects.filter(created_at__lt=expiry_time).delete()
+    VirtualDebitCardModel.objects.filter(created_at__lt=expiry_time).delete()
+    # VirtualNetBankingDetailsModel.objects.filter(created_at__lt=expiry_time).delete()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(delete_expired_data, 'interval', minutes=1)
+scheduler.add_job(remove_expired_virtual_cards, 'interval', minutes=5)
 scheduler.start()
 
 class GenerateRandomCreditCardView(APIView):
@@ -50,13 +51,13 @@ class GenerateRandomCreditCardView(APIView):
             user = request.user
             credit_card = VirtualCreditCardModel.objects.create(
                 user=user,
-                cvv= generate_random_cvv(),
                 card_number=generate_random_card_number(),
                 card_holder_name=f'{user.name}',
-                expiration_date=timezone.now().date() + timezone.timedelta(days=365*5),  # 5 years validity
-                pin=generate_random_pin()  # Generate PIN
+                expiration_date=timezone.now().date() + timezone.timedelta(days=365*5),
+                cvv=generate_random_cvv(),
+                pin=generate_random_pin()
             )
-            serializer = CreditCardSerializer(credit_card)
+            serializer = VirtualCreditCardSerializer(credit_card)
             return Response(serializer.data)
         except Exception as e:
             logger.error(f"Error generating credit card: {e}")
@@ -69,20 +70,20 @@ class GenerateRandomDebitCardView(APIView):
     def get(self, request):
         try:
             user = request.user
-            credit_card = VirtualDebitCardModel.objects.create(
+            debit_card = VirtualDebitCardModel.objects.create(
                 user=user,
-                cvv= generate_random_cvv(),
                 card_number=generate_random_card_number(),
                 card_holder_name=f'{user.name}',
-                expiration_date=timezone.now().date() + timezone.timedelta(days=365*5),  # 5 years validity
-                pin=generate_random_pin()  # Generate PIN
+                expiration_date=timezone.now().date() + timezone.timedelta(days=365*5),
+                cvv=generate_random_cvv(),
+                pin=generate_random_pin()
             )
-            serializer = DebitCardSerializer(credit_card)
+            serializer = VirtualDebitCardSerializer(debit_card)
             return Response(serializer.data)
         except Exception as e:
-            logger.error(f"Error generating credit card: {e}")
+            logger.error(f"Error generating debit card: {e}")
             logger.error(traceback.format_exc())
-            return Response({'error': 'An error occurred while generating the credit card'}, status=500)
+            return Response({'error': 'An error occurred while generating the debit card'}, status=500)
         
 class ReportTransaction(APIView):
     permission_classes = [IsAuthenticated]
