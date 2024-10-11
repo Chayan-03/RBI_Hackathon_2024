@@ -213,8 +213,8 @@ def main():
 
         # Display the image with detected QR code
         # cv2.imshow("Image", image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
     else:
         print("QR code not detected")
 

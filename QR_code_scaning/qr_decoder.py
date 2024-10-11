@@ -49,7 +49,7 @@ import cv2
 import os
 
 # Define the image path
-image_path = 'Untitled.png'
+image_path = 'num.png'
 
 # Check if the file exists
 if not os.path.exists(image_path):
@@ -82,7 +82,9 @@ else:
 
             # Display the image with detected QR code
             #cv2.imshow("Image", image)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            #cv2.waitKey(0)
+            #cv2.destroyAllWindows()
         else:
             print("QR code not detected")
+### this code is working fine 
+### pip install opencv-python-headless
