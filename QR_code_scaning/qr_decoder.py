@@ -49,7 +49,7 @@ import cv2
 import os
 
 # Define the image path
-image_path = 'num.png'
+image_path = 'upi.png'
 
 # Check if the file exists
 if not os.path.exists(image_path):

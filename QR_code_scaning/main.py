@@ -1,6 +1,6 @@
 from qr_decoder.py import decode_qr_code
 from url_scanner import check_url_safety
-#from database_check import check_database
+from database_check import check_database
 image_path = 'Untitled.png'
 def main(image_path):
     decoded_info = decode_qr_code(image_path)

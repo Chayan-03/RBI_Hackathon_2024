@@ -21,6 +21,19 @@ def extract_urls(text):
     urls_string = ' '.join(urls)
     return urls_string
 
+# Function to extract phone numbers from text
+def extract_phone_numbers(text):
+    
+    phone_pattern = re.compile(r'\+?91?(\d{10})')
+    phone_numbers = re.findall(phone_pattern, text)
+    return phone_numbers
+
+# Function to extract UPI IDs from text
+def extract_upi_ids(text):
+    upi_pattern = re.compile(r'[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}')
+    upi_ids = re.findall(upi_pattern, text)
+    return upi_ids
+
 # Function to check if a URL exists
 def check_url_exists(url):
     try:
@@ -155,10 +168,10 @@ def check_url_safety(url):
     
     return result
 
-# Main function to integrate QR code detection and URL safety check
+# Main function to integrate QR code detection, URL safety check, phone number, and UPI extraction
 def main():
     # Define the image path
-    image_path = 'upi.png'
+    image_path = 'rbi3.png'
 
     # Check if the file exists
     if not os.path.exists(image_path):
@@ -195,6 +208,15 @@ def main():
         extracted_urls = extract_urls(decodedText)
         print("Extracted URLs:", extracted_urls)
 
+        # Extract phone numbers from the decoded text
+        phone_numbers = extract_phone_numbers(decodedText)
+        print("Extracted Phone Numbers:", phone_numbers)
+
+        # Extract UPI IDs from the decoded text
+        upi_ids = extract_upi_ids(decodedText)
+        print("Extracted UPI IDs:", upi_ids)
+
+        # Table for URL safety checks
         table = []
         for url in extracted_urls.split():
             result = check_url_safety(url)

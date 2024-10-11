@@ -8,7 +8,39 @@ import ssl
 import socket
 import OpenSSL.crypto as crypto
 from tabulate import tabulate
+import django
+from django.conf import settings
+from django.db import models
 
+# Configure Django settings (simplified for example)
+'''
+settings.configure(
+    DATABASES={
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'mydatabase',
+        }
+    },
+    INSTALLED_APPS=[
+        'myapp',
+    ],
+)
+
+django.setup()
+
+# Define your models (simplified for example)
+class Account(models.Model):
+    account_number = models.CharField(max_length=255)
+    upi_id = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
+
+def check_database(info):
+    if Account.objects.filter(account_number=info).exists() or \
+       Account.objects.filter(upi_id=info).exists() or \
+       Account.objects.filter(phone_number=info).exists():
+        return True
+    return False
+'''
 # Define the VirusTotal API key
 VT_API_KEY = 'd5458d3b59c3d7378e05cbeb994d77eaf953b565b272106739d61a8578365992'
 
@@ -155,10 +187,24 @@ def check_url_safety(url):
     
     return result
 
+# Function to check if the decoded text is a phone number or UPI ID
+def check_phone_or_upi(decoded_text):
+    # Regular expression to check phone numbers (Indian format example)
+    phone_pattern = re.compile(r'^\+?\d{10,15}$')
+    
+    # Regular expression to check UPI IDs (generic UPI format)
+    upi_pattern = re.compile(r'^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$')
+    
+    if phone_pattern.match(decoded_text):
+        return 'phone'
+    elif upi_pattern.match(decoded_text):
+        return 'upi'
+    return None
+
 # Main function to integrate QR code detection and URL safety check
 def main():
     # Define the image path
-    image_path = 'upi.png'
+    image_path = 'rbi3.png'
 
     # Check if the file exists
     if not os.path.exists(image_path):
@@ -191,32 +237,50 @@ def main():
 
         print("Decoded Text from QR Code:", decodedText)
 
+        # Check if the decoded text is a phone number or UPI ID
+        result_type = check_phone_or_upi(decodedText)
+        if result_type:
+            '''
+            if check_database(decodedText):
+                print(f"{result_type.capitalize()} found in database: {decodedText}")
+            else:
+                print(f"{result_type.capitalize()} not found in database: {decodedText}")
+                '''
+        else:
+            print("The decoded text is not a phone number or UPI ID.")
+
         # Extract URLs from the decoded text
-        extracted_urls = extract_urls(decodedText)
-        print("Extracted URLs:", extracted_urls)
+        urls = extract_urls(decodedText)
+        if urls:
+            # Check URL safety for each extracted URL
+            url_results = []
+            for url in urls.split():
+                url_safety_info = check_url_safety(url)
+                url_results.append(url_safety_info)
 
-        table = []
-        for url in extracted_urls.split():
-            result = check_url_safety(url)
-            row = [
-                result.get("url"),
-                result.get("is_malicious"),
-                result.get("related_to_cybercrime"),
-                result.get("redirects_to_fraud"),
-                result.get("confidence")
+            # Display URL results in tabular format
+            headers = ["URL", "Malicious", "Cybercrime", "Redirects to Fraud", "SSL Certificate", "Risk Percentage", "Confidence"]
+            table_data = [
+                [
+                    result['url'], 
+                    result.get('is_malicious', 'N/A'), 
+                    result.get('related_to_cybercrime', 'N/A'), 
+                    result.get('redirects_to_fraud', 'N/A'), 
+                    result.get('has_certificate', 'N/A'), 
+                    result.get('risk_percentage', 'N/A'), 
+                    result.get('confidence', 'N/A')
+                ]
+                for result in url_results
             ]
-            table.append(row)
+            print(tabulate(table_data, headers, tablefmt="grid"))
 
-        # Print results in a tabular format
-        headers = ["URL", "Malicious", "Related to Cybercrime", "Redirects to Fraud", "Confidence"]
-        print(tabulate(table, headers=headers))
+        # Save the image with the QR code marked
+        output_path = 'output_image.png'
+        cv2.imwrite(output_path, image)
+        print(f"QR code marked image saved to {output_path}")
 
-        # Display the image with detected QR code
-        # cv2.imshow("Image", image)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
     else:
-        print("QR code not detected")
+        print("QR code not detected in the image.")
 
 if __name__ == "__main__":
     main()
