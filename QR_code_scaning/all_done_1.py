@@ -34,6 +34,11 @@ def extract_upi_ids(text):
     upi_ids = re.findall(upi_pattern, text)
     return upi_ids
 
+# Function to extract account numbers from text
+def extract_account_numbers(text):
+    account_number_pattern = re.compile(r'\b\d{11,14}\b')
+    account_numbers = re.findall(account_number_pattern, text)
+    return account_numbers
 # Function to check if a URL exists
 def check_url_exists(url):
     try:
@@ -168,10 +173,10 @@ def check_url_safety(url):
     
     return result
 
-# Main function to integrate QR code detection, URL safety check, phone number, and UPI extraction
+# Main function to integrate QR code detection, URL safety check, phone number, UPI extraction, and account number extraction
 def main():
     # Define the image path
-    image_path = 'rbi3.png'
+    image_path = 'acc_num.png'
 
     # Check if the file exists
     if not os.path.exists(image_path):
@@ -216,6 +221,10 @@ def main():
         upi_ids = extract_upi_ids(decodedText)
         print("Extracted UPI IDs:", upi_ids)
 
+        # Extract account numbers from the decoded text
+        account_numbers = extract_account_numbers(decodedText)
+        print("Extracted Account Numbers:", account_numbers)
+
         # Table for URL safety checks
         table = []
         for url in extracted_urls.split():
@@ -235,8 +244,8 @@ def main():
 
         # Display the image with detected QR code
         # cv2.imshow("Image", image)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
     else:
         print("QR code not detected")
 
