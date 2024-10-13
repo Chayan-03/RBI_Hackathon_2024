@@ -10,7 +10,7 @@ import OpenSSL.crypto as crypto
 from tabulate import tabulate
 
 # Define the VirusTotal API key
-VT_API_KEY = 'd5458d3b59c3d7378e05cbeb994d77eaf953b565b272106739d61a8578365992'
+VT_API_KEY = 'SECRET API KEY'
 
 # Function to extract URLs from a text
 def extract_urls(text):
